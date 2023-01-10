@@ -1,31 +1,16 @@
 import { galleryItems } from "./gallery-items.js";
 // Change code below this line
-const galleryElem = document.querySelector(".gallery");
+const galleryEl = document.querySelector("ul.gallery");
 
-const markup = galleryItems
-  .map(
-    (item) => `<li><a class="gallery__item" href="${item.original}">
-  <img
-    class="gallery__image"
-    src="${item.preview}"
-    data-source="${item.original}"
-    alt="${item.description}"
-  />
-</a></li>`
-  )
-  .join("");
-
-galleryElem.insertAdjacentHTML("beforeend", markup);
-
-galleryElem.addEventListener("click", onImageClick);
-
-function onImageClick(e) {
-  e.preventDefault();
-  if (e.target.nodeName !== "IMG") {
-    return;
-  }
-  const lightbox = new SimpleLightbox(".gallery a", {
-    captionsData: "alt",
-    captionDelay: "250",
-  });
+function makeGallery(arr) {
+  const galleryItemsMarkup = arr
+    .map(({ preview, original, description }) => {
+      return `<li><a class="gallery__item" href="${original}"><img class="gallery__image" src="${preview}" alt="${description}" title="${description}" /></a></li>`;
+    })
+    .join("");
+  return galleryEl.insertAdjacentHTML("afterbegin", galleryItemsMarkup);
 }
+
+makeGallery(galleryItems);
+const gallery = new SimpleLightbox("ul.gallery a");
+console.log(galleryItems);

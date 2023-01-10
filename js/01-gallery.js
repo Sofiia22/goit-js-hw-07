@@ -1,44 +1,55 @@
-import { galleryItems } from './gallery-items.js';
+import { galleryItems } from "./gallery-items.js";
 // Change code below this line
-const galleryElem = document.querySelector(".gallery");
+const galleryEl = document.querySelector("div");
 
-const markup = galleryItems
-.map(
-    (item) => `<div class="gallery__item">
-<a class="gallery__link" href="${item.original}">
-  <img
-    class="gallery__image"
-    src="${item.preview}"
-    data-source="${item.original}"
-    alt="${item.description}"
-  />
-</a>
-</div>`
-  )
-    .join("");
-  galleryElem.insertAdjacentHTML("beforeend", markup);
+galleryEl.addEventListener("click", onClickShowModal);
 
-galleryElem.addEventListener("click", onImageClick);
+const galleryMarkup = galleryItems.map(galleryElMarkup).join("");
 
-function onImageClick(e) {
+galleryEl.insertAdjacentHTML("afterbegin", galleryMarkup);
+
+function galleryElMarkup({ preview, original, description }) {
+  return `<div class="gallery__item">
+  <a class="gallery__link" href="${original}">
+      <img
+        class="gallery__image"
+        src="${preview}"
+        data-source="${original}"
+        alt="${description}"
+      />
+      </a> 
+  </div>`;
+}
+function onClickShowModal(e) {
   e.preventDefault();
 
-  if (e.target.nodeName !== "IMG") {
-    return;
-  }
-  const instance = basicLightbox.create(`
-  <img src = "${e.target.dataset.source}" width="800" height="600">
-`);
-  instance.show();
+  if (e.target.nodeName !== "IMG") return;
 
-  galleryElem.addEventListener("keydown", onKeyClose);
+  const instance = basicLightbox.create(
+    `
+  <div class="modal">
+    <img
+    class="modal__image"
+    src="${e.target.dataset.source}"
+    />
+  </div>
+  `,
+    {
+      onShow: (instance) => {
+        window.addEventListener("keydown", onEscPress);
+        instance.element().querySelector("img").onclick = instance.close;
+      },
+      onClose: (instance) => {
+        window.removeEventListener("keydown", onEscPress);
+      },
+    }
+  );
 
-  function onKeyClose(e) {
+    function onEscPress(e) {
     if (e.code === "Escape") {
       instance.close();
-      galleryElem.removeEventListener("keydown", onKeyClose);
     }
   }
+  instance.show();
 }
-
 console.log(galleryItems);
